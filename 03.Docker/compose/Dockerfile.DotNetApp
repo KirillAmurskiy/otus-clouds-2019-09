@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0
+
+COPY DotNetWebApp/DotNetWebApp.AspNet/bin/Release/netcoreapp3.0/publish/ app/
+
+EXPOSE 80
+
+ENTRYPOINT ["dotnet", "app/DotNetWebApp.AspNet.dll"]

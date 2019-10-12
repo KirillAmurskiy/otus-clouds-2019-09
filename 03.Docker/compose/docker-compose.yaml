@@ -1,0 +1,19 @@
+version: "3"
+services:
+  nginx:
+    image: kirillamurskiy/otus-clouds-2019-09-hw3-nginx-reverseproxy:1.0.0
+    container_name: nginx-reverseproxy
+    restart: unless-stopped
+    ports:
+      - 5000:80
+    networks:
+      - mydotnetnetwork
+  dotnetapp:
+    image: kirillamurskiy/otus-clouds-2019-09-hw3-dotnetwebapp:1.0.0
+    container_name: dotnetwebapp
+    restart: unless-stopped
+    networks:
+      - mydotnetnetwork
+networks:
+  mydotnetnetwork:
+    driver: bridge
