@@ -31,18 +31,13 @@ resource "aws_db_instance" "otus-rds-mysql8" {
 }
 
 resource "aws_instance" "otus-services" {
-  ami                    = "ami-00e1f29e07f02ad05"
+  ami                    = "ami-0b2e6fbf8c9364ab6"
   instance_type          = "t3.micro"
-  vpc_security_group_ids = [aws_security_group.instance.id]
-
-  user_data = <<-EOF
-              #!/bin/bash
-              echo "Hello, World" > index.html
-              nohup busybox httpd -f -p 8080 &
-              EOF
-
+  availability_zone      = "eu-north-1a"
+  vpc_security_group_ids = [aws_security_group.otus-services-security-group.id]
+  
   tags = {
-    Name = "terraform-example"
+    Name = "otus-clouds-08-services"
   }
 }
 
@@ -67,6 +62,41 @@ resource "aws_security_group" "otus-services-security-group" {
     from_port   = 5020
     to_port     = 5020
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 15672
+    to_port     = 15672
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 5672
+    to_port     = 5672
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -24,6 +24,11 @@
   }],
   "provisioners": [
     {
+      "type": "file",
+      "source": "./authorized_keys",
+      "destination": "/home/ubuntu/.ssh/"
+    },
+    {
       "type": "shell",
       "environment_vars": ["GITHUB_ACCESSTOKEN={{user `github_accesstoken`}}"],
       "script": "./installDockerAndCo.sh"
