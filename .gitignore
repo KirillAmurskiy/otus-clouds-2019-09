@@ -8,6 +8,8 @@
 
 Db/Backup/
 
+.terraform
+
 # User-specific files
 *.suo
 *.user

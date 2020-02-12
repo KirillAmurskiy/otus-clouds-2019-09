@@ -1,0 +1,232 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "Otus students IAM users stack"
+
+Parameters:
+
+  UserName:
+    Type: String
+
+  Password:
+    NoEcho: true
+    Type: String
+
+Resources:
+
+  OtusUserPublicSecurityGroup:
+    DependsOn: OtusUser
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+      - Key: student
+        Value: !Ref OtusUser
+      GroupDescription: !Sub 'Default Public Security Group for ${OtusUser}'
+
+  OtusUserPrivateSecurityGroup:
+    DependsOn: OtusUser
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+      - Key: student
+        Value: !Ref OtusUser
+      GroupDescription: !Sub 'Default Private Security Group for ${OtusUser}'
+
+  OtusUser:
+    Type: AWS::IAM::User
+    Properties: 
+      UserName: !Ref UserName
+      LoginProfile: 
+        Password: !Ref Password
+        PasswordResetRequired: true
+      ManagedPolicyArns:
+      - !Ref OtusStudentIamAccess
+      - !Ref OtusStudentEc2Access
+      - !Ref OtusUserPasswordAndAccessKeysAccess
+      - !Ref OtusStudentCloudWatch
+      - !Ref OtusStudentS3Access
+
+  OtusStudentEc2Access:
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - ec2:Describe*
+          - ec2:CreateKeyPair
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - ec2:AuthorizeSecurityGroupEgress
+          - ec2:AuthorizeSecurityGroupIngress
+          - ec2:RevokeSecurityGroup*
+          Resource:
+          - '*'
+          Condition:
+            StringEquals:
+              'ec2:ResourceTag/student': '${aws:username}'
+        - Effect: Allow
+          Action:
+          - ec2:RunInstances
+          Resource:
+          - arn:aws:ec2:*:*:instance/*
+          Condition:
+            StringEquals:
+              'ec2:InstanceType':
+              - 't2.micro'
+              - 't3.micro'
+              'aws:RequestTag/student': '${aws:username}'
+              'aws:RequestedRegion': !Ref 'AWS::Region'
+            ForAllValues:StringEquals:
+              aws:TagKeys: student
+        - Effect: Allow
+          Action:
+          - ec2:CreateTags
+          Resource:
+          - 'arn:aws:ec2:*:*:instance/*'
+          - 'arn:aws:ec2:*:*:volume/*'
+          Condition:
+            StringEquals:
+              'aws:RequestTag/student': '${aws:username}'
+              'ec2:CreateAction':
+              - RunInstances
+            ForAllValues:StringEquals:
+              'aws:TagKeys': 'student'
+        - Effect: Allow
+          Action:
+          - ec2:RunInstances
+          Resource:
+          - arn:aws:ec2:*:*:image/ami-*
+          - arn:aws:ec2:*:*:subnet/*
+          - arn:aws:ec2:*:*:network-interface/*
+          - arn:aws:ec2:*:*:volume/*
+          - arn:aws:ec2:*:*:key-pair/*
+          - arn:aws:ec2:*:*:security-group/*
+        - Effect: Allow
+          Action:
+          - ec2:TerminateInstances
+          - ec2:StopInstances
+          - ec2:StartInstances
+          - ec2:AssociateIamInstanceProfile
+          - ec2:ReplaceIamInstanceProfileAssociation
+          - ec2:DisassociateIamInstanceProfile
+          Resource: '*'
+          Condition:
+            StringEquals:
+              'ec2:ResourceTag/student': '${aws:username}'
+
+  OtusStudentIamAccess:
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - iam:ListRoles
+          - iam:ListInstanceProfiles
+          - iam:GetAccountSummary
+          - iam:ListAccountAliases
+          - iam:ListPolicies
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - iam:CreatePolicy
+          - iam:CreatePolicyVersion
+          - iam:DeletePolicyVersion
+          - iam:GetPolicyVersion
+          - iam:GetPolicy
+          - iam:DeletePolicy
+          Resource: 'arn:aws:iam::*:policy/${aws:username}*'
+        - Effect: Allow
+          Action:
+          - iam:DetachRolePolicy
+          - iam:AttachRolePolicy
+          - iam:ListRolePolicies
+          - iam:ListAttachedRolePolicies
+          - iam:GetRole
+          - iam:DeleteRole
+          - iam:PassRole
+          Resource:
+          - !Join ['', [ 'arn:aws:iam::', !Ref 'AWS::AccountId', ':role/${aws:username}*']]
+        - Effect: Allow
+          Action:
+          - iam:CreateRole
+          Resource:
+          - !Join ['', [ 'arn:aws:iam::', !Ref 'AWS::AccountId', ':role/${aws:username}*']]
+          Condition:
+            StringEquals:
+             'iam:PermissionsBoundary': !Sub 'arn:aws:iam::${AWS::AccountId}:policy/otus-students-permissions-boundary'
+        - Effect: Allow
+          Action:
+          - iam:CreateInstanceProfile
+          - iam:AddRoleToInstanceProfile
+          - iam:DeleteInstanceProfile
+          - iam:GetInstanceProfile
+          - iam:RemoveRoleFromInstanceProfile
+          Resource:
+          - !Join ['', [ 'arn:aws:iam::', !Ref 'AWS::AccountId', ':instance-profile/${aws:username}*']]
+
+  OtusUserPasswordAndAccessKeysAccess:
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - iam:ChangePassword
+          - iam:ListGroupsForUser
+          - iam:ListAttachedUserPolicies
+          - iam:ListUserPolicies
+          - iam:GetUser
+          - iam:ListUserTags
+          - iam:ListAccessKeys
+          - iam:ListSSHPublicKeys
+          - iam:ListServiceSpecificCredentials
+          - iam:ListMFADevices
+          - iam:GetLoginProfile
+          - iam:ListSigningCertificates
+          - iam:CreateAccessKey
+          - iam:DeleteAccessKey
+          Resource:
+          - !Join ['', [ 'arn:aws:iam::', !Ref 'AWS::AccountId', ':user/${aws:username}*']]
+        - Effect: Allow
+          Action:
+          - iam:GetAccountPasswordPolicy
+          - iam:ListUsers
+          Resource: '*'
+
+  OtusStudentCloudWatch:
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - cloudwatch:DescribeAlarms
+          - cloudwatch:GetMetricStatistics
+          Resource: '*'
+
+  OtusStudentS3Access:
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:*
+          Resource:
+          - 'arn:aws:s3:::otus-test/${aws:username}'
+          - 'arn:aws:s3:::otus-test/${aws:username}/*'
+        - Effect: Allow
+          Action: s3:ListBucket
+          Resource: arn:aws:s3:::otus-test
+          Condition:
+            StringLike:
+              s3:prefix:
+              - ''
+              - '${aws:username}/*'
