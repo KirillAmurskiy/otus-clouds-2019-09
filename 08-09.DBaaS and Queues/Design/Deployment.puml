@@ -1,0 +1,25 @@
+@startuml
+skinparam componentStyle uml2
+
+cloud aws {
+    node "VM with Docker" <<EC2>> {
+        component nginx <<Container>>
+        component Backend <<Container>>
+        component Frontend <<Container>>
+        queue RabbitMq <<Container>>
+        
+        nginx -r-> Backend
+        nginx -d-> Frontend
+        Backend <--> RabbitMq
+    }
+    
+    node <<RDS>> {
+        node Instance1 <<EC2>> {
+            database MySql8 
+        }
+    }
+    
+    Backend -d-> MySql8
+}
+
+@enduml
