@@ -1,0 +1,60 @@
+@startuml
+
+digraph graph1 {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_iam_instance_profile.otus_services_instance_profile" [label = "aws_iam_instance_profile.otus_services_instance_profile", shape = "box"]
+		"[root] aws_iam_role.iam_role_lambda_sqs_consumer" [label = "aws_iam_role.iam_role_lambda_sqs_consumer", shape = "box"]
+		"[root] aws_iam_role.otus_services_instance_role" [label = "aws_iam_role.otus_services_instance_role", shape = "box"]
+		"[root] aws_iam_role_policy_attachment.lambda_sqs_consumer_policy_attachment" [label = "aws_iam_role_policy_attachment.lambda_sqs_consumer_policy_attachment", shape = "box"]
+		"[root] aws_iam_role_policy_attachment.otus_services_policy_attachment" [label = "aws_iam_role_policy_attachment.otus_services_policy_attachment", shape = "box"]
+		"[root] aws_instance.otus-services" [label = "aws_instance.otus-services", shape = "box"]
+		"[root] aws_lambda_alias.lambda_dev_alias" [label = "aws_lambda_alias.lambda_dev_alias", shape = "box"]
+		"[root] aws_lambda_event_source_mapping.sqs_lambda_mapping" [label = "aws_lambda_event_source_mapping.sqs_lambda_mapping", shape = "box"]
+		"[root] aws_lambda_function.otus-cloud-lamda-function" [label = "aws_lambda_function.otus-cloud-lamda-function", shape = "box"]
+		"[root] aws_s3_bucket.otus-cloud-lamda-testfunctions" [label = "aws_s3_bucket.otus-cloud-lamda-testfunctions", shape = "box"]
+		"[root] aws_security_group.otus-services-security-group" [label = "aws_security_group.otus-services-security-group", shape = "box"]
+		"[root] aws_sqs_queue.otus_cloud_deadletter_queue" [label = "aws_sqs_queue.otus_cloud_deadletter_queue", shape = "box"]
+		"[root] aws_sqs_queue.otus_cloud_queue" [label = "aws_sqs_queue.otus_cloud_queue", shape = "box"]
+		"[root] output.services_public_dns" [label = "output.services_public_dns", shape = "note"]
+		"[root] output.sqs_connection" [label = "output.sqs_connection", shape = "note"]
+		"[root] output.sqs_deadletter_connection" [label = "output.sqs_deadletter_connection", shape = "note"]
+		"[root] provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] aws_iam_instance_profile.otus_services_instance_profile" -> "[root] aws_iam_role.otus_services_instance_role"
+		"[root] aws_iam_role.iam_role_lambda_sqs_consumer" -> "[root] provider.aws"
+		"[root] aws_iam_role.otus_services_instance_role" -> "[root] provider.aws"
+		"[root] aws_iam_role_policy_attachment.lambda_sqs_consumer_policy_attachment" -> "[root] aws_iam_role.iam_role_lambda_sqs_consumer"
+		"[root] aws_iam_role_policy_attachment.otus_services_policy_attachment" -> "[root] aws_iam_role.otus_services_instance_role"
+		"[root] aws_instance.otus-services" -> "[root] aws_iam_instance_profile.otus_services_instance_profile"
+		"[root] aws_instance.otus-services" -> "[root] aws_security_group.otus-services-security-group"
+		"[root] aws_lambda_alias.lambda_dev_alias" -> "[root] aws_lambda_function.otus-cloud-lamda-function"
+		"[root] aws_lambda_event_source_mapping.sqs_lambda_mapping" -> "[root] aws_lambda_alias.lambda_dev_alias"
+		"[root] aws_lambda_event_source_mapping.sqs_lambda_mapping" -> "[root] aws_sqs_queue.otus_cloud_queue"
+		"[root] aws_lambda_function.otus-cloud-lamda-function" -> "[root] aws_iam_role.iam_role_lambda_sqs_consumer"
+		"[root] aws_s3_bucket.otus-cloud-lamda-testfunctions" -> "[root] provider.aws"
+		"[root] aws_security_group.otus-services-security-group" -> "[root] provider.aws"
+		"[root] aws_sqs_queue.otus_cloud_deadletter_queue" -> "[root] provider.aws"
+		"[root] aws_sqs_queue.otus_cloud_queue" -> "[root] aws_sqs_queue.otus_cloud_deadletter_queue"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] aws_iam_role_policy_attachment.lambda_sqs_consumer_policy_attachment"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] aws_iam_role_policy_attachment.otus_services_policy_attachment"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] aws_lambda_event_source_mapping.sqs_lambda_mapping"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] aws_s3_bucket.otus-cloud-lamda-testfunctions"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] output.services_public_dns"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] output.sqs_connection"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] output.sqs_deadletter_connection"
+		"[root] output.services_public_dns" -> "[root] aws_instance.otus-services"
+		"[root] output.sqs_connection" -> "[root] aws_sqs_queue.otus_cloud_queue"
+		"[root] output.sqs_deadletter_connection" -> "[root] aws_sqs_queue.otus_cloud_deadletter_queue"
+		"[root] provider.aws (close)" -> "[root] aws_iam_role_policy_attachment.lambda_sqs_consumer_policy_attachment"
+		"[root] provider.aws (close)" -> "[root] aws_iam_role_policy_attachment.otus_services_policy_attachment"
+		"[root] provider.aws (close)" -> "[root] aws_instance.otus-services"
+		"[root] provider.aws (close)" -> "[root] aws_lambda_event_source_mapping.sqs_lambda_mapping"
+		"[root] provider.aws (close)" -> "[root] aws_s3_bucket.otus-cloud-lamda-testfunctions"
+		"[root] root" -> "[root] meta.count-boundary (EachMode fixup)"
+		"[root] root" -> "[root] provider.aws (close)"
+	}
+}
+
+@enduml
+

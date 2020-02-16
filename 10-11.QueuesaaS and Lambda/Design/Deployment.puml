@@ -1,0 +1,34 @@
+@startuml
+skinparam componentStyle uml2
+
+cloud aws {
+    node "VM with Docker" <<EC2>> {
+        component nginx <<Container>>
+        component Backend <<Container>>
+        component Frontend <<Container>>
+        database MySql8 <<Container>>
+        
+        nginx -l-> Backend
+        nginx -d-> Frontend
+    }
+    
+    
+    node <<SQS>> {
+    
+        queue UserRegisteredQueue
+        queue DeadLetterQueue
+        
+        UserRegisteredQueue --> DeadLetterQueue: after 5 fails
+    }
+    
+    node <<Lambda>> {
+    
+        component UserRegisteredHandler <<Function>>
+    }
+    
+    Backend -d-> MySql8
+    Backend -l-> UserRegisteredQueue: on user registered
+    UserRegisteredQueue -u-> UserRegisteredHandler: handle
+}
+
+@enduml
