@@ -61,7 +61,7 @@ resource "aws_security_group" "socialnetwork_instance_sg" {
     from_port   = var.server_port
     to_port     = var.server_port
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [aws_security_group.socialnetwork_lb_sg.id]
   }
 
   ingress {
