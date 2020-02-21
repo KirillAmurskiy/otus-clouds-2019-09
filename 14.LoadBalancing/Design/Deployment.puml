@@ -1,0 +1,29 @@
+@startuml
+skinparam componentStyle uml2
+
+cloud aws {
+
+    node LoadBalancing {
+        
+        node LoadBalancer <<LoadBalancer>> {
+            component "http:80" <<Listener>> as listener 
+            component "*" <<Rule>> as rule
+        }
+        
+        component "http:8080" <<TargetGroup>> as targetGroup 
+        
+        listener -d-> rule: traffic
+        rule --> targetGroup: traffic
+    }
+    
+    node "VM with Docker" <<AutoScalingGroup>> as autoScalingGroup {
+        node "availabity zone 1\nNode1\nhttp:8080" <<EC2>> as node1
+        node "availabity zone 2\nNode2\nhttp:8080" <<EC2>> as node2
+    }
+    
+    targetGroup --> node1: traffic, health check
+    targetGroup --> node2: traffic, health check
+    targetGroup --> autoScalingGroup: notify if a node is dead
+}
+
+@enduml

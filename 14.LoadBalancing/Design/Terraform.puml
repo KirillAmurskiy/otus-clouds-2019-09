@@ -1,0 +1,54 @@
+@startuml
+
+digraph graph1 {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_autoscaling_group.socialnetwork_asg" [label = "aws_autoscaling_group.socialnetwork_asg", shape = "box"]
+		"[root] aws_launch_configuration.socialnetwork_lc" [label = "aws_launch_configuration.socialnetwork_lc", shape = "box"]
+		"[root] aws_lb.socialnetwork_lb" [label = "aws_lb.socialnetwork_lb", shape = "box"]
+		"[root] aws_lb_listener.socialnetwork_lb_http_listner" [label = "aws_lb_listener.socialnetwork_lb_http_listner", shape = "box"]
+		"[root] aws_lb_listener_rule.socialnetwork_lb_listener_rule" [label = "aws_lb_listener_rule.socialnetwork_lb_listener_rule", shape = "box"]
+		"[root] aws_lb_target_group.socialnetwork_lb_tg" [label = "aws_lb_target_group.socialnetwork_lb_tg", shape = "box"]
+		"[root] aws_security_group.socialnetwork_instance_sg" [label = "aws_security_group.socialnetwork_instance_sg", shape = "box"]
+		"[root] aws_security_group.socialnetwork_lb_sg" [label = "aws_security_group.socialnetwork_lb_sg", shape = "box"]
+		"[root] data.aws_subnet_ids.default" [label = "data.aws_subnet_ids.default", shape = "box"]
+		"[root] data.aws_vpc.default" [label = "data.aws_vpc.default", shape = "box"]
+		"[root] output.socialnetwork_lb_dns_name" [label = "output.socialnetwork_lb_dns_name", shape = "note"]
+		"[root] provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] var.alb_security_group_name" [label = "var.alb_security_group_name", shape = "note"]
+		"[root] var.alb_tg_name" [label = "var.alb_tg_name", shape = "note"]
+		"[root] var.instance_security_group_name" [label = "var.instance_security_group_name", shape = "note"]
+		"[root] var.server_port" [label = "var.server_port", shape = "note"]
+		"[root] aws_autoscaling_group.socialnetwork_asg" -> "[root] aws_launch_configuration.socialnetwork_lc"
+		"[root] aws_autoscaling_group.socialnetwork_asg" -> "[root] aws_lb_target_group.socialnetwork_lb_tg"
+		"[root] aws_autoscaling_group.socialnetwork_asg" -> "[root] data.aws_subnet_ids.default"
+		"[root] aws_launch_configuration.socialnetwork_lc" -> "[root] aws_security_group.socialnetwork_instance_sg"
+		"[root] aws_lb.socialnetwork_lb" -> "[root] aws_security_group.socialnetwork_lb_sg"
+		"[root] aws_lb.socialnetwork_lb" -> "[root] data.aws_subnet_ids.default"
+		"[root] aws_lb.socialnetwork_lb" -> "[root] var.alb_tg_name"
+		"[root] aws_lb_listener.socialnetwork_lb_http_listner" -> "[root] aws_lb.socialnetwork_lb"
+		"[root] aws_lb_listener_rule.socialnetwork_lb_listener_rule" -> "[root] aws_lb_listener.socialnetwork_lb_http_listner"
+		"[root] aws_lb_listener_rule.socialnetwork_lb_listener_rule" -> "[root] aws_lb_target_group.socialnetwork_lb_tg"
+		"[root] aws_lb_target_group.socialnetwork_lb_tg" -> "[root] data.aws_vpc.default"
+		"[root] aws_lb_target_group.socialnetwork_lb_tg" -> "[root] var.alb_tg_name"
+		"[root] aws_lb_target_group.socialnetwork_lb_tg" -> "[root] var.server_port"
+		"[root] aws_security_group.socialnetwork_instance_sg" -> "[root] provider.aws"
+		"[root] aws_security_group.socialnetwork_instance_sg" -> "[root] var.instance_security_group_name"
+		"[root] aws_security_group.socialnetwork_instance_sg" -> "[root] var.server_port"
+		"[root] aws_security_group.socialnetwork_lb_sg" -> "[root] provider.aws"
+		"[root] aws_security_group.socialnetwork_lb_sg" -> "[root] var.alb_security_group_name"
+		"[root] data.aws_subnet_ids.default" -> "[root] data.aws_vpc.default"
+		"[root] data.aws_vpc.default" -> "[root] provider.aws"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] aws_autoscaling_group.socialnetwork_asg"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] aws_lb_listener_rule.socialnetwork_lb_listener_rule"
+		"[root] meta.count-boundary (EachMode fixup)" -> "[root] output.socialnetwork_lb_dns_name"
+		"[root] output.socialnetwork_lb_dns_name" -> "[root] aws_lb.socialnetwork_lb"
+		"[root] provider.aws (close)" -> "[root] aws_autoscaling_group.socialnetwork_asg"
+		"[root] provider.aws (close)" -> "[root] aws_lb_listener_rule.socialnetwork_lb_listener_rule"
+		"[root] root" -> "[root] meta.count-boundary (EachMode fixup)"
+		"[root] root" -> "[root] provider.aws (close)"
+	}
+}
+
+@enduml
