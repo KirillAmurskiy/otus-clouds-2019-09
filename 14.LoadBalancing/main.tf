@@ -46,7 +46,7 @@ resource "aws_autoscaling_group" "socialnetwork_asg" {
 
   min_size = 2
   max_size = 2
-  suspended_processes = ["Terminate"]
+  
   tag {
     key                 = "Name"
     value               = "socialnetwork-asg"
