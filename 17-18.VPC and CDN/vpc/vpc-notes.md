@@ -1,4 +1,4 @@
-### 1. VPC
+### VPC
 1. Что такое *public/private subnets*?
 <br/><br/>
 *Public subnet* - это Subnet, которая привязана к *RouteTable* у которой
@@ -19,5 +19,3 @@
     *public subnet*)
     * *NatGateway* требует привязки к *ElasticIP*, именно от этого
     *ElasticIP* он будет обращаться в интернет.
-
-4. VPN

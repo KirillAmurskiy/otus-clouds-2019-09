@@ -116,7 +116,7 @@ resource "aws_route_table_association" "otus-17-private-rt-association" {
 
 resource "aws_ec2_client_vpn_endpoint" "otus-17-vpn-endpoint" {
 
-  client_cidr_block      = "192.168.0.0/22"
+  client_cidr_block      = "11.0.0.0/22"
   
   server_certificate_arn = "arn:aws:acm:eu-north-1:447890362554:certificate/e05772d5-d43d-43f0-a7c6-d62d5af11bb2"
 
@@ -129,7 +129,7 @@ resource "aws_ec2_client_vpn_endpoint" "otus-17-vpn-endpoint" {
   connection_log_options {
     enabled               = true
     cloudwatch_log_group  = "/aws/vpn-endpoints"
-    #cloudwatch_log_stream = "otus-17"
+    cloudwatch_log_stream = "otus-17"
   }
 
   tags = {
@@ -140,6 +140,14 @@ resource "aws_ec2_client_vpn_endpoint" "otus-17-vpn-endpoint" {
 resource "aws_ec2_client_vpn_network_association" "otus-17-vpn-network-association" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.otus-17-vpn-endpoint.id
   subnet_id              = aws_subnet.otus-17-private-subn.id
+}
+
+# allow access only to private subnet
+resource "null_resource" "client_vpn_ingress" {
+  provisioner "local-exec" {
+    when = create
+    command = "aws ec2 authorize-client-vpn-ingress --client-vpn-endpoint-id ${aws_ec2_client_vpn_endpoint.otus-17-vpn-endpoint.id} --target-network-cidr ${aws_subnet.otus-17-private-subn.cidr_block} --authorize-all-groups"
+  }
 }
 
 resource "aws_instance" "otus-17-ec2-in-private" {

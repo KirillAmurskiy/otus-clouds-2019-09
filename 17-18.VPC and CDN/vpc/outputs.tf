@@ -3,9 +3,19 @@ output "ec2-in-private-subnet-public-ip" {
   description = "Public ip of ec2 instance in private subnet"
 }
 
+output "ec2-in-private-subnet-private-ip" {
+  value       = aws_instance.otus-17-ec2-in-private.private_ip
+  description = "Private ip of ec2 instance in private subnet"
+}
+
 output "ec2-in-public-subnet-public-ip" {
   value       = aws_instance.otus-17-ec2-in-public.public_ip
   description = "Public ip of ec2 instance in public subnet"
+}
+
+output "ec2-in-public-subnet-private-ip" {
+  value       = aws_instance.otus-17-ec2-in-public.private_ip
+  description = "Private ip of ec2 instance in public subnet"
 }
 
 output "nat-gw-eip-public-ip" {
@@ -16,5 +26,10 @@ output "nat-gw-eip-public-ip" {
 output "vpn-endpoint-dns-name" {
   value       = aws_ec2_client_vpn_endpoint.otus-17-vpn-endpoint.dns_name
   description = "Dns name of vpn endpoint"
+}
+
+output "vpn-endpoint-id" {
+  value       = aws_ec2_client_vpn_endpoint.otus-17-vpn-endpoint.id
+  description = "Id of vpn endpoint"
 }
 
