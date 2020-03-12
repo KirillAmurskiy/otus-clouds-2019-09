@@ -120,6 +120,7 @@ resource "aws_ec2_client_vpn_endpoint" "otus-17-vpn-endpoint" {
   
   server_certificate_arn = "arn:aws:acm:eu-north-1:447890362554:certificate/e05772d5-d43d-43f0-a7c6-d62d5af11bb2"
 
+  split_tunnel = true
   authentication_options {
     type                       = "certificate-authentication"
     # the same as server
