@@ -216,25 +216,25 @@ resource "aws_cloudfront_distribution" "otus-17-cf-distribution" {
     max_ttl                = 0
   }
   
-  #ordered_cache_behavior {
-  #  path_pattern     = "/_next/*"
-  #  allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-  #  cached_methods   = ["GET", "HEAD", "OPTIONS"]
-  #  target_origin_id = aws_lb.otus-17-lb.id
-#
-  #  forwarded_values {
-  #    query_string = true
-  #    cookies {
-  #      forward = "all"
-  #    }
-  #  }
-#
-  #  min_ttl                = 0
-  #  default_ttl            = 86400
-  #  max_ttl                = 31536000
-  #  compress               = true
-  #  viewer_protocol_policy = "allow-all"
-  #}
+  ordered_cache_behavior {
+    path_pattern     = "/_next/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = aws_lb.otus-17-lb.id
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "all"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "allow-all"
+  }
 
 
   price_class = "PriceClass_100"
