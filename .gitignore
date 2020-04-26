@@ -9,6 +9,7 @@
 Db/Backup/
 
 .terraform
+gcp-init/packer/gcloud-kirill-amurskiy-key.json
 
 # User-specific files
 *.suo
@@ -279,3 +280,4 @@ __pycache__/
 # tools/
 
 # End of https://www.gitignore.io/api/aspnetcore
+/gcp-init/packer/gcloud-kirill-amurskiy-key.json

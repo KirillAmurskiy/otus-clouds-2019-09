@@ -1,0 +1,24 @@
+{
+  "variables": {
+    "github_accesstoken": "{{env `GITHUB_ACCESSTOKEN`}}"
+  },
+  "builders": [
+    {
+      "type": "googlecompute",
+      "account_file": "gcloud-kirill-amurskiy-key.json",
+      "project_id": "otus-cloud-2019-09-274812",
+      "source_image_family": "ubuntu-1804-lts",
+      "ssh_username": "packer",
+      "zone": "europe-north1-a",
+      "image_name": "ubuntu1804-docker-logged-to-github"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+        "GITHUB_ACCESSTOKEN={{user `github_accesstoken`}}"],
+      "script": "./installDockerAndCo.sh"
+    }
+  ]
+}
