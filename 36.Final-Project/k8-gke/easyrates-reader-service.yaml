@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: easyrates-reader
+  labels:
+    app: easyrates-reader
+    tier: backend
+spec:
+  #type: NodePort
+  type: LoadBalancer
+  ports:
+    - port: 80 # from service port
+      targetPort: 80 # to container port
+      #nodePort: 30475 # needs type: NodePort
+  selector:
+    app: easyrates-reader
+    tier: backend

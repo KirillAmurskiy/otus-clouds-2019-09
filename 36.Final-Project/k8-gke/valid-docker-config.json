@@ -1,0 +1,8 @@
+{
+	"auths": {
+		"docker.pkg.github.com": {
+			"auth": "your-auth-token"
+		},
+		"https://index.docker.io/v1/": {}
+	}
+}

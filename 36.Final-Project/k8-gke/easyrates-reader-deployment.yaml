@@ -1,0 +1,69 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: easyrates-reader
+  labels:
+    app: easyrates-reader
+spec:
+  selector:
+    matchLabels:
+      app: easyrates-reader
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: easyrates-reader
+        tier: backend
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      initContainers:
+        - name: easyrates-db-migrator
+          image: docker.pkg.github.com/kirillamurskiy/easyrates/easyrates-migrator:latest
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: EasyRates__Server
+              value: 10.34.144.6
+            - name: EasyRates__Port
+              value: "5432"
+            - name: EasyRates__Creator
+              value: postgres
+            - name: EasyRates__CreatorPassword
+              value: admin
+            - name: EasyRates__CreatorDb
+              value: postgres
+            - name: EasyRates__Migrator
+              value: easyrates_migrator
+            - name: EasyRates__MigratorPassword
+              value: easyrates_migrator
+            - name: EasyRates__MigratorDb
+              value: easyrates
+            - name: EasyRates__CreateDb
+              value: "true"
+            - name: EasyRates__ShowPII
+              value: "true"
+              
+      containers:
+        - name: easyrates-reader
+          image: docker.pkg.github.com/kirillamurskiy/easyrates/easyrates-reader:latest
+          resources:
+            limits:
+              cpu: "1"
+            requests:
+              cpu: "0.5"
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: Auth__UseTestAuth
+              value: "true"
+            - name: ConnectionStrings__DefaultConnection
+              value: server=10.34.144.6;port=5432;database=easyrates;user id=easyrates_app;password=easyrates_app;
+            - name: DbType
+              value: Postgres
+      
+
+  
